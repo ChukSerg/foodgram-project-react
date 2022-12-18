@@ -2,17 +2,24 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
+from recipes import constans
+from recipes.validators import WordNameValidator
+
 User = get_user_model()
 
 
+regex_validator = WordNameValidator()
+
+
 class Ingredient(models.Model):
-    name = models.CharField(max_length=150, unique=True,
+    name = models.CharField(max_length=constans.MAX_LENGTH_INGREDIENT,
+                            unique=True,
                             verbose_name='Название инградиента',
-                            validators=[RegexValidator(
-                                regex='^[а-яА-ЯёЁa-zA-Z0-9 -]+$',
-                                message='Запрещенные символы в названии')])
+                            help_text='Введите название ингредиента',
+                            validators=[regex_validator])
     measurement_unit = models.CharField(
-        max_length=16, verbose_name='Единица измерения')
+        max_length=16, verbose_name='Единица измерения',
+        help_text='Единицы измерения в метрической системе мер')
 
     class Meta:
         ordering = ('name',)
@@ -24,19 +31,26 @@ class Ingredient(models.Model):
 
 
 class Tags(models.Model):
-    name = models.CharField(max_length=200, unique=True,
+    name = models.CharField(max_length=constans.MAX_LENGTH_TAGS,
+                            unique=True,
                             verbose_name='Название тега',
-                            validators=[RegexValidator(
-                                regex='^[а-яА-ЯёЁa-zA-Z0-9 -]+$',
-                                message='Запрещенные символы в названии')])
+                            help_text='Введите название тега',
+                            validators=[regex_validator])
     color = models.CharField(
         max_length=7, unique=True,
         verbose_name='Цвет в HEX',
+        help_text='Введите цвет тега в виде HEX-кода',
         validators=[RegexValidator(
-            regex='^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$',
+            regex='^#([A-Fa-f0-9]{3,6})$',
             message='Введенное значение не является HEX-кодом!')]
     )
-    slug = models.SlugField(max_length=200, unique=True, verbose_name='Слаг')
+    slug = models.SlugField(
+        max_length=constans.MAX_LENGTH_TAGS_SLUG,
+        unique=True,
+        verbose_name='Слаг',
+        help_text='Введите короткое название тега',
+        validators=[regex_validator]
+    )
 
     class Meta:
         ordering = ('name',)
@@ -52,26 +66,31 @@ class Recipes(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор рецепта',
+        help_text='Пользователь, написавший рецепт',
         related_name='recipe'
     )
     name = models.CharField(
-        max_length=150,
+        max_length=constans.MAX_LENGTH_RECIPES,
         unique=True,
-        verbose_name='Название рецепта'
+        verbose_name='Название рецепта',
+        help_text='Введите название рецепта'
     )
     image = models.ImageField(
         verbose_name='Картинка блюда',
-        upload_to='recipes/image/'
+        upload_to='recipes/image/',
+        help_text='Добавьте файл с изображением'
     )
     text = models.TextField(verbose_name='Описание рецепта')
     ingredients = models.ManyToManyField(
-        Ingredient, through='Structure',
-        verbose_name='Ингредиенты'
+        Ingredient, through='RecipeIngredient',
+        verbose_name='Ингредиенты',
+        help_text='Добавьте описание рецепта'
     )
     tags = models.ManyToManyField(Tags, verbose_name='Теги')
     pub_date = models.DateTimeField(auto_now_add=True)
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name='Время приготовления в минутах'
+        verbose_name='Время приготовления в минутах',
+        help_text='Время приготовления в минутах'
     )
 
     class Meta:
@@ -80,19 +99,19 @@ class Recipes(models.Model):
         verbose_name_plural = 'Рецепты'
 
 
-class Structure(models.Model):
+class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE,
                                related_name='amount')
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,)
     amount = models.PositiveSmallIntegerField(
         verbose_name='Количество инградиентов',
+        help_text='Введите количество инградиента в рецепте',
         validators=[
             MinValueValidator(1, message='Минимальное количество - 1')
         ]
     )
 
     class Meta:
-        default_related_name = 'ingridient_recipe'
         constraints = (
             models.UniqueConstraint(
                 fields=('recipe', 'ingredient',),
@@ -107,7 +126,9 @@ class Structure(models.Model):
 
 class Favorite(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='favorites')
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorites')
     recipe = models.ForeignKey(
         Recipes, on_delete=models.CASCADE
     )

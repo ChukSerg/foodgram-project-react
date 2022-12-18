@@ -1,8 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
+from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
@@ -10,10 +13,12 @@ from rest_framework.response import Response
 
 from api.serializers import (FavoriteSerializer, IngredientSerializer,
                              RecipeListSerializer, RecipesWriteSerializer,
-                             TagsSerializer)
+                             TagsSerializer, FollowSerializer)
 from recipes.models import (Favorite, Ingredient, Recipes, ShoppingCart,
                             Tags)
 from api.permissions import IsAuthorOrReadOnly
+
+User = get_user_model()
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
@@ -98,3 +103,38 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('name',)
+
+
+class FollowUserView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, id):
+        author = get_object_or_404(User, id=id)
+        serializer = FollowSerializer(
+            request.user.follower.create(author=author),
+            context={"request": request},
+        )
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED
+        )
+
+    def delete(self, request, id):
+        author = get_object_or_404(User, id=id)
+        if request.user.follower.filter(author=author).exists():
+            request.user.follower.filter(
+                author=author
+            ).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {"errors": "Автор отсутсвует в списке подписок"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class SubscriptionsView(ListAPIView):
+    serializer_class = FollowSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return self.request.user.follower.all()

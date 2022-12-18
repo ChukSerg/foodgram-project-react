@@ -1,19 +1,36 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import UniqueConstraint
+from django.core.validators import RegexValidator
+
 from users.validators import check_username
+from users import constants
 
 
 class User(AbstractUser):
-    email = models.EmailField(max_length=254, unique=True)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150, blank=False)
-    password = models.CharField(max_length=150)
-    username = models.CharField(max_length=150, unique=True,
-                                validators=[check_username])
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+
+    email = models.EmailField(max_length=constants.MAX_LENGTH_EMAIL,
+                              unique=True,
+                              verbose_name='Электронная почта',
+                              help_text='Введите e-mail')
+    first_name = models.CharField(max_length=constants.MAX_LENGTH_FIRST_NAME,
+                                  verbose_name='Имя',
+                                  help_text='Введите свое имя')
+    last_name = models.CharField(max_length=constants.MAX_LENGTH_LAST_NAME,
+                                 verbose_name='Фамилия',
+                                 help_text='Введите свою фамилию')
+    password = models.CharField(max_length=constants.MAX_LENGTH_PASSWORD,
+                                verbose_name='Пароль для входа',
+                                help_text='Придумайте пароль')
+    username = models.CharField(
+        max_length=constants.MAX_LENGTH_USERNAME, unique=True,
+        verbose_name='Имя пользователя',
+        help_text='Придумайте никнейм',
+        validators=[check_username,
+                    RegexValidator(regex=r'^[\w.@+-]+$',
+                                   message='Запрещенные символы в имени')])
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -44,7 +61,11 @@ class Follow(models.Model):
             UniqueConstraint(
                 fields=['user', 'author'],
                 name='unique_follow'
-            )
+            ),
+            models.CheckConstraint(
+                name="Ограничение на самоподписку",
+                check=~models.Q(user=models.F('author')),
+            ),
         ]
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
