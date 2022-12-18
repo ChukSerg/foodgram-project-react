@@ -81,11 +81,11 @@ class Recipes(models.Model):
         help_text='Добавьте файл с изображением'
     )
     text = models.TextField(verbose_name='Описание рецепта')
-    ingredients = models.ManyToManyField(
+    """ingredients = models.ManyToManyField(
         Ingredient, through='RecipeIngredient',
         verbose_name='Ингредиенты',
         help_text='Добавьте описание рецепта'
-    )
+    )"""
     tags = models.ManyToManyField(Tags, verbose_name='Теги')
     pub_date = models.DateTimeField(auto_now_add=True)
     cooking_time = models.PositiveSmallIntegerField(
@@ -102,7 +102,11 @@ class Recipes(models.Model):
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE,
                                related_name='amount')
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,)
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name='+'
+    )
     amount = models.PositiveSmallIntegerField(
         verbose_name='Количество инградиентов',
         help_text='Введите количество инградиента в рецепте',
@@ -130,7 +134,9 @@ class Favorite(models.Model):
         on_delete=models.CASCADE,
         related_name='favorites')
     recipe = models.ForeignKey(
-        Recipes, on_delete=models.CASCADE
+        Recipes,
+        on_delete=models.CASCADE,
+        related_name='+'
     )
 
     class Meta:
@@ -148,7 +154,10 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='shopping_cart')
     recipe = models.ForeignKey(
-        Recipes, on_delete=models.CASCADE)
+        Recipes,
+        on_delete=models.CASCADE,
+        related_name='+'
+    )
 
     class Meta:
         verbose_name = 'Лист покупок'

@@ -36,7 +36,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def add_in_list(self, model, user, pk):
         if model.objects.filter(user=user, recipe__id=pk).exists():
             return Response(
-                {'errors': f'Рецепт уже добавлен в {model}'},
+                {'errors': f'Рецепт уже добавлен в {model.__name__}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         recipe = get_object_or_404(Recipes, pk=pk)
@@ -73,15 +73,15 @@ class RecipesViewSet(viewsets.ModelViewSet):
             permission_classes=(IsAuthenticated,))
     def download_shopping_cart(self, request):
         ingredients = request.user.shopping_cart.values(
-            'recipe__ingredients__name',
-            'recipe__ingredients__measurement_unit'
+            'recipe__amount__ingredient__name',
+            'recipe__amount__ingredient__measurement_unit'
         ).annotate(amount=Sum('recipe__amount__amount'))
         shopping_list = 'Список покупок: \n'
-        for ingredient in ingredients:
+        for ingr in ingredients:
             shopping_list += (
-                f'{ingredient["recipe__ingredients__name"]} '
-                f'({ingredient["recipe__ingredients__measurement_unit"]}) - '
-                f'{ingredient["amount"]} \n'
+                f'{ingr["recipe__amount__ingredient__name"]} '
+                f'({ingr["recipe__amount__ingredient__measurement_unit"]}) - '
+                f'{ingr["amount"]} \n'
             )
         response = HttpResponse(shopping_list, 'Content-Type: text/plain')
         response['Content-Disposition'] = (
@@ -110,6 +110,11 @@ class FollowUserView(APIView):
 
     def post(self, request, id):
         author = get_object_or_404(User, id=id)
+        if request.user.follower.filter(author=author).exists():
+            return Response(
+                {"errors": "Вы уже подписаны на автора"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         serializer = FollowSerializer(
             request.user.follower.create(author=author),
             context={"request": request},
