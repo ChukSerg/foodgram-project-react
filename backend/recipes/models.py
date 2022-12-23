@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
-from recipes import constans
+from recipes import constants
 from recipes.validators import WordNameValidator
 
 User = get_user_model()
@@ -12,13 +12,14 @@ regex_validator = WordNameValidator()
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=constans.MAX_LENGTH_INGREDIENT,
+    name = models.CharField(max_length=constants.MAX_LENGTH_INGREDIENT,
                             unique=True,
                             verbose_name='Название инградиента',
                             help_text='Введите название ингредиента',
                             validators=[regex_validator])
     measurement_unit = models.CharField(
-        max_length=16, verbose_name='Единица измерения',
+        max_length=constants.MAX_LENGTH_MEAS_UNIT,
+        verbose_name='Единица измерения',
         help_text='Единицы измерения в метрической системе мер')
 
     class Meta:
@@ -31,13 +32,14 @@ class Ingredient(models.Model):
 
 
 class Tags(models.Model):
-    name = models.CharField(max_length=constans.MAX_LENGTH_TAGS,
+    name = models.CharField(max_length=constants.MAX_LENGTH_TAGS,
                             unique=True,
                             verbose_name='Название тега',
                             help_text='Введите название тега',
                             validators=[regex_validator])
     color = models.CharField(
-        max_length=7, unique=True,
+        max_length=constants.MAX_LENGTH_TAGS_COLOR,
+        unique=True,
         verbose_name='Цвет в HEX',
         help_text='Введите цвет тега в виде HEX-кода',
         validators=[RegexValidator(
@@ -45,7 +47,7 @@ class Tags(models.Model):
             message='Введенное значение не является HEX-кодом!')]
     )
     slug = models.SlugField(
-        max_length=constans.MAX_LENGTH_TAGS_SLUG,
+        max_length=constants.MAX_LENGTH_TAGS_SLUG,
         unique=True,
         verbose_name='Слаг',
         help_text='Введите короткое название тега',
@@ -70,10 +72,11 @@ class Recipes(models.Model):
         related_name='recipe'
     )
     name = models.CharField(
-        max_length=constans.MAX_LENGTH_RECIPES,
+        max_length=constants.MAX_LENGTH_RECIPES,
         unique=True,
         verbose_name='Название рецепта',
-        help_text='Введите название рецепта'
+        help_text='Введите название рецепта',
+        validators=[regex_validator]
     )
     image = models.ImageField(
         verbose_name='Картинка блюда',
@@ -81,11 +84,6 @@ class Recipes(models.Model):
         help_text='Добавьте файл с изображением'
     )
     text = models.TextField(verbose_name='Описание рецепта')
-    """ingredients = models.ManyToManyField(
-        Ingredient, through='RecipeIngredient',
-        verbose_name='Ингредиенты',
-        help_text='Добавьте описание рецепта'
-    )"""
     tags = models.ManyToManyField(Tags, verbose_name='Теги')
     pub_date = models.DateTimeField(auto_now_add=True)
     cooking_time = models.PositiveSmallIntegerField(
