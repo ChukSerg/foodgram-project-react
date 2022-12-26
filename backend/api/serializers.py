@@ -98,7 +98,7 @@ class RecipesWriteSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault()
     )
-    image = Base64ImageField(max_length=None, use_url=True, read_only=True)
+    image = Base64ImageField(max_length=None, use_url=True)
 
     class Meta:
         model = Recipes
