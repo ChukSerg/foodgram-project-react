@@ -16,9 +16,7 @@ SECRET_KEY = ')=zlbb0ckaw5zu6pw3jr1%x0z&8c02p)uu&e_6ymi2m!vgxqf)'
 
 DEBUG = os.getenv('DEBUG', default=True)
 
-ALLOWED_HOSTS = ['51.250.4.42',
-                 'localhost',
-                 'angiolog.myftp.org']
+ALLOWED_HOSTS = ['*']
 
 
 INSTALLED_APPS = [
