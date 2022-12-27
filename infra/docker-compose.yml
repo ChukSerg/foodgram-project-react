@@ -1,6 +1,6 @@
 version: '3.3'
 services:
-  foodgram:
+  db:
     image: postgres:13.0-alpine
     volumes:
       - db_value:/var/lib/postgresql/data/
@@ -13,7 +13,7 @@ services:
       - static_value:/app/static/
       - media_value:/app/media/
     depends_on:
-      - foodgram
+      - db
     env_file:
       - ./.env
 
