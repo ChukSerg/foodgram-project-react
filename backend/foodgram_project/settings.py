@@ -11,6 +11,7 @@ MAX_LENGTH_EMAIL = 254
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+#os
 SECRET_KEY = ')=zlbb0ckaw5zu6pw3jr1%x0z&8c02p)uu&e_6ymi2m!vgxqf)'
 
 DEBUG = os.getenv('DEBUG', default=True)
