@@ -16,7 +16,7 @@ from api.serializers import (FavoriteSerializer, IngredientSerializer,
                              TagsSerializer, FollowSerializer)
 from recipes.models import (Favorite, Ingredient, Recipes, ShoppingCart,
                             Tags)
-from api.filters import IngredientFilter
+from api.filters import IngredientFilter, RecipeFilter
 from api.permissions import IsAuthorOrReadOnly
 
 User = get_user_model()
@@ -26,6 +26,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
+    filter_class = RecipeFilter
     filterset_fields = ('tags',)
     permission_classes = (IsAuthorOrReadOnly,)
 
