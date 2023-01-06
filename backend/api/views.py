@@ -3,7 +3,7 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.decorators import action
@@ -16,6 +16,7 @@ from api.serializers import (FavoriteSerializer, IngredientSerializer,
                              TagsSerializer, FollowSerializer)
 from recipes.models import (Favorite, Ingredient, Recipes, ShoppingCart,
                             Tags)
+from api.filters import IngredientFilter
 from api.permissions import IsAuthorOrReadOnly
 
 User = get_user_model()
@@ -101,21 +102,10 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filter_backends = (DjangoFilterBackend)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_class = IngredientFilter
     filterset_fields = ('name',)
-
-    def get_queryset(self):
-        name = self.request.query_params.get('name')
-        queryset = self.queryset
-        if name:
-            name = name.lower()
-            stw_queryset = list(queryset.filter(name__startswith=name))
-            cnt_queryset = queryset.filter(name__contains=name)
-            queryset = stw_queryset.extend(
-                [i for i in cnt_queryset if i not in stw_queryset]
-            )
-            queryset = stw_queryset
-        return queryset
+    search_fields = ('name')
 
 
 class FollowUserView(APIView):
