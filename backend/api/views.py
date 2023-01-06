@@ -34,6 +34,21 @@ class RecipesViewSet(viewsets.ModelViewSet):
             return FavoriteSerializer
         return RecipesWriteSerializer
 
+    def get_queryset(self):
+        queryset = Recipes.objects.all()
+        author = self.request.user
+        if self.request.GET.get('is_favorited'):
+            favorite_recipes_ids = Favorite.objects.filter(
+                author=author).values('recipe_id')
+
+            return queryset.filter(pk__in=favorite_recipes_ids)
+
+        if self.request.GET.get('is_in_shopping_cart'):
+            cart_recipes_ids = ShoppingCart.objects.filter(
+                author=author).values('recipe_id')
+            return queryset.filter(pk__in=cart_recipes_ids)
+        return queryset
+
     def add_in_list(self, model, user, pk):
         if model.objects.filter(user=user, recipe__id=pk).exists():
             return Response(
