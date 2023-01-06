@@ -13,7 +13,6 @@ regex_validator = WordNameValidator()
 
 class Ingredient(models.Model):
     name = models.CharField(max_length=constants.MAX_LENGTH_INGREDIENT,
-                            unique=True,
                             verbose_name='Название инградиента',
                             help_text='Введите название ингредиента',
                             validators=[regex_validator])
@@ -26,6 +25,12 @@ class Ingredient(models.Model):
         ordering = ('name',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('name', 'measurement_unit'),
+                name='unique_ingredients',
+            ),
+        )
 
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
