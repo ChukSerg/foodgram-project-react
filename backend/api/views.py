@@ -3,7 +3,7 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.decorators import action
@@ -101,7 +101,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend,filters.SearchFilter)
     filterset_fields = ('name',)
 
 
