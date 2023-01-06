@@ -103,6 +103,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ('name',)
+    search_fields = ('name',)
 
 
 class FollowUserView(APIView):
