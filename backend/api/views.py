@@ -24,7 +24,7 @@ User = get_user_model()
 
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
-    pagination_class = LimitOffsetPagination
+    #pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filter_class = RecipeFilter
     filterset_fields = ('tags',)
