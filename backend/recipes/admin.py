@@ -12,11 +12,15 @@ class RecipesAdmin(admin.ModelAdmin):
     def favorite_count(self, obj):
         return Favorite.objects.filter(recipe=obj).count()
 
+    def get_ordering(self, request):
+        return ['name', 'favorite_count']
+
 
 @admin.register(Ingredient)
 class IngredientsAdmin(admin.ModelAdmin):
     list_display = ('name', 'measurement_unit')
     list_filter = ('name',)
+    search_fields = ('name',)
 
 
 @admin.register(Tags)
