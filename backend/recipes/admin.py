@@ -7,6 +7,11 @@ from recipes.models import (Favorite, Ingredient, Recipes, ShoppingCart,
 class RecipesAdmin(admin.ModelAdmin):
     list_display = ('name', 'author')
     list_filter = ('name', 'author', 'tags')
+    readonly_fields = ('favorite_count',)
+
+    def favorite_count(self, obj):
+        return Favorite.objects.filter(recipe=obj).count()
+
 
 
 @admin.register(Ingredient)

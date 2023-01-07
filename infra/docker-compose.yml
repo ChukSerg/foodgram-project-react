@@ -5,7 +5,7 @@ services:
     volumes:
       - db_value:/var/lib/postgresql/data/
     env_file:
-      - ./.env
+      - .env
   web:
     image: chukin71/foodgram:latest
     restart: always
@@ -15,7 +15,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ./.env
+      - .env
 
   frontend:
     image: chukin71/foodfront:latest
@@ -34,7 +34,7 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
       - ../frontend/build:/usr/share/nginx/html/
-      - ../docs/:/usr/share/nginx/html/api/docs/
+      - ./docs/:/usr/share/nginx/html/api/docs/
     depends_on:
       - web
 
