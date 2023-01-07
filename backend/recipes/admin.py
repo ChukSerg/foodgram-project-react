@@ -13,7 +13,6 @@ class RecipesAdmin(admin.ModelAdmin):
         return Favorite.objects.filter(recipe=obj).count()
 
 
-
 @admin.register(Ingredient)
 class IngredientsAdmin(admin.ModelAdmin):
     list_display = ('name', 'measurement_unit')
