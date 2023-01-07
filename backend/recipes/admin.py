@@ -5,7 +5,7 @@ from recipes.models import (Favorite, Ingredient, Recipes, ShoppingCart,
 
 @admin.register(Recipes)
 class RecipesAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author')
+    list_display = ('name', 'author', 'favorite_count',)
     list_filter = ('name', 'author', 'tags')
     readonly_fields = ('favorite_count',)
 
