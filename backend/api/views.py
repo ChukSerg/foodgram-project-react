@@ -18,6 +18,7 @@ from recipes.models import (Favorite, Ingredient, Recipes, ShoppingCart,
                             Tags)
 from api.filters import IngredientFilter, RecipeFilter
 from api.permissions import IsAuthorOrReadOnly
+from api.paginators import CustomPagination
 
 User = get_user_model()
 
@@ -28,6 +29,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     filter_class = RecipeFilter
     filterset_fields = ('tags',)
     permission_classes = (IsAuthorOrReadOnly,)
+    pagination_class = CustomPagination
 
     def get_serializer_class(self):
         if self.action == 'favorite' or self.action == 'shopping_cart':
