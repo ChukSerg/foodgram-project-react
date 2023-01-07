@@ -12,9 +12,6 @@ class RecipesAdmin(admin.ModelAdmin):
     def favorite_count(self, obj):
         return Favorite.objects.filter(recipe=obj).count()
 
-    def get_ordering(self, request):
-        return ['name', 'favorite_count']
-
 
 @admin.register(Ingredient)
 class IngredientsAdmin(admin.ModelAdmin):
