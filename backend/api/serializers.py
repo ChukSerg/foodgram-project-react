@@ -150,7 +150,11 @@ class RecipesWriteSerializer(serializers.ModelSerializer):
         tags = self.initial_data.get('tags')
         cooking_time = self.validated_data('cooking_time')
         author = serializers.CurrentUserDefault()(self)
-        new_recipe = Recipes.objects.create(author=author, cooking_time=cooking_time, **validated_data)
+        new_recipe = Recipes.objects.create(
+            author=author,
+            cooking_time=cooking_time,
+            **validated_data
+        )
         new_recipe.tags.set(tags)
         self.add_ingredients(new_recipe, ingredients)
         return new_recipe
