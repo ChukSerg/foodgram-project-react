@@ -128,13 +128,13 @@ class RecipesWriteSerializer(serializers.ModelSerializer):
             ) for ingr in ingredients
         ])
 
-    def validate_ingredients(self, data):
+    """def validate_ingredients(self, data):
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
             raise ValidationError('Необходим хотя бы 1 ингредиент')
         return data
 
-    """def validate_cooking_time(self, data):
+    def validate_cooking_time(self, data):
         cooking_time = self.initial_data('cooking_time')
         if cooking_time < 1:
             raise ValidationError('Время приготовления должно быть больше 0')
