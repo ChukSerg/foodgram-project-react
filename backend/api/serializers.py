@@ -33,7 +33,7 @@ class RecipeIngredientWriteSerializer(serializers.Serializer):
     def validate_amount(self, value):
         if value < 1:
             raise serializers.ValidationError(
-                'Проверьте что количество ингредиентов больше 1!'
+                'Проверьте, что количество ингредиента больше 1!'
             )
         return value
 
@@ -139,6 +139,11 @@ class RecipesWriteSerializer(serializers.ModelSerializer):
         if cooking_time < 1:
             raise ValidationError('Время приготовления должно быть больше 0')
         return data"""
+
+    def validate_cooking_time(self, value):
+        if value <= 0:
+            raise ValidationError(
+                'Отрицательное или нулевое время приготовления')
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
