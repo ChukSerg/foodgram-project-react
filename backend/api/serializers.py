@@ -135,7 +135,7 @@ class RecipesWriteSerializer(serializers.ModelSerializer):
         return data
 
     def validate_cooking_time(self, data):
-        cooking_time = self.initial_data('cooking_time')
+        cooking_time = self.initial_data.get('cooking_time')
         if cooking_time < 1:
             raise ValidationError('Время приготовления должно быть больше 0')
         return data
