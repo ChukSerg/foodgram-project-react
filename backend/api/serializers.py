@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from djoser.serializers import UserSerializer
 
 from recipes.models import (Favorite, Ingredient, Recipes, ShoppingCart,
@@ -126,6 +127,12 @@ class RecipesWriteSerializer(serializers.ModelSerializer):
                 amount=ingr.get('amount')
             ) for ingr in ingredients
         ])
+
+    def validate_ingredients(self, data):
+        ingredients = self.initial_data.get('ingredients')
+        if not ingredients:
+            raise ValidationError('Необходим хотя бы 1 ингредиент')
+        return data
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
