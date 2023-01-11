@@ -25,11 +25,6 @@ class TagsAdmin(admin.ModelAdmin):
     list_display = ('name', 'color', 'slug')
 
 
-@admin.register(RecipeIngredient)
-class RecipeIngredientAdmin(admin.ModelAdmin):
-    list_display = ('ingredient', 'amount', 'recipe')
-
-
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')

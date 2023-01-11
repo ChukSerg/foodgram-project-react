@@ -29,6 +29,13 @@ class RecipeIngredientWriteSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     amount = serializers.IntegerField(write_only=True)
 
+    def validate_amount(self, value):
+        if value < 1:
+            raise serializers.ValidationError(
+                'Проверьте что количество ингредиентов больше 1!'
+            )
+        return value
+
 
 class RecipeIngredientReadSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='ingredient_id')
