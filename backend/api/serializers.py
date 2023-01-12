@@ -132,6 +132,15 @@ class RecipesWriteSerializer(serializers.ModelSerializer):
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
             raise ValidationError('Необходим хотя бы 1 ингредиент')
+        unique_ingredients = []
+        for ingredient in ingredients:
+            ingr_id = ingredient['id']
+            if ingr_id not in unique_ingredients:
+                unique_ingredients.append(ingr_id)
+            else:
+                raise ValidationError(
+                    'Уберите дубль ингредиента'
+                )
         return data
 
     def validate_cooking_time(self, data):
