@@ -1,6 +1,10 @@
 from django.contrib import admin
 from recipes.models import (Favorite, Ingredient, Recipes, ShoppingCart,
-                            Tags)
+                            RecipeIngredient, Tags)
+
+
+class RecipeIngredientInline(admin.StackedInline):
+    model = RecipeIngredient
 
 
 @admin.register(Recipes)
@@ -8,6 +12,7 @@ class RecipesAdmin(admin.ModelAdmin):
     list_display = ('name', 'author', 'favorite_count',)
     list_filter = ('name', 'author', 'tags')
     readonly_fields = ('favorite_count',)
+    inlines = [RecipeIngredientInline]
 
     def favorite_count(self, obj):
         return Favorite.objects.filter(recipe=obj).count()
