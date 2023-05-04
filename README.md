@@ -7,6 +7,8 @@
 - Python 3.7
 - Django 2.2.16
 - Djangorestframework 3.12.4
+- PostgreSQL
+- Docker-compose
 #### Запуск проекта в dev-режиме
 - Клонируйте репозиторий с помощью команды
 ````
